@@ -24,7 +24,58 @@ app.get("/api/hello", function (req, res) {
   res.json({greeting: 'hello API'});
 });
 
+app.get("/api/:date?", function (req, res) {
+  const date = req.params.date;
+  console.log("Req[", date, "]");
+  
+  if (date === undefined) {
+    const now = new Date();
+    const utcTimestamp = now.toUTCString();
+    const unixTimestamp = now.getTime();
 
+    res.json({ utc: utcTimestamp, unix: unixTimestamp });
+  } 
+  else if (date.includes("-")) {
+    const dates = date.split("-"); 
+    if (dates.length === 3) {
+      const year = parseInt(dates[0]);
+      const monthIndex = parseInt(dates[1]) - 1;
+      const day = parseInt(dates[2]);
+
+      const utcTimestamp = new Date(year, monthIndex, day).toUTCString();
+      const unixTimestamp = new Date(year, monthIndex, day).getTime();
+      res.json({ unix: unixTimestamp, utc: utcTimestamp });
+    }
+    else{
+          res.json({ error: 'Invalid Date' });
+    }
+  } 
+  else {
+     
+    const timestamp = parseInt(date);
+    if (!isNaN(timestamp)) {
+      const singleDate = new Date(timestamp);
+      const unixTimestamp = singleDate.getTime();
+      res.json({ unix: unixTimestamp, utc: singleDate.toUTCString() });
+    } else {
+       let dateS;
+      try {
+        dateS = new Date(date);
+        if (!isNaN(dateS)) {
+          const unixTimestamp = dateS.getTime();
+          res.json({ unix: unixTimestamp, utc: dateS.toUTCString() });
+          return
+        } else {
+          res.json({ error: 'Invalid Date' });
+          return
+        }
+      } catch (error) {
+        
+      }
+      res.json({ error: 'Invalid Date' });
+    }
+  }
+});
 
 // listen for requests :)
 var listener = app.listen(process.env.PORT, function () {
