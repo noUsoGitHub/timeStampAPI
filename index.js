@@ -52,8 +52,9 @@ app.get("/api/:date?", function (req, res) {
   } 
   else {
      
-    const timestamp = parseInt(date);
-    if (!isNaN(timestamp)) {
+    if (!isNaN(date)) {
+      
+      const timestamp = parseInt(date);
       const singleDate = new Date(timestamp);
       const unixTimestamp = singleDate.getTime();
       res.json({ unix: unixTimestamp, utc: singleDate.toUTCString() });
